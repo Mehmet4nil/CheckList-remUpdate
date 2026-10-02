@@ -38,6 +38,13 @@ jobs:
           printf '%s' "$FCM_KEY" > "$RUNNER_TEMP/key.json"
           CHECKLIST_FCM_KEY="$RUNNER_TEMP/key.json" python3 tool/dispatch_announcements.py
 
+      # Panel kullanici listesi: yeni surumu henuz acmamis hesaplarin
+      # profilini olustur (var olana dokunmaz). Hata gonderimi etkilemez.
+      - name: Panel kullanici listesini tamamla
+        if: always()
+        continue-on-error: true
+        run: CHECKLIST_FCM_KEY="$RUNNER_TEMP/key.json" python3 tool/sync_profiles.py
+
       # Acik repolarda 60 gun degisiklik olmazsa GitHub zamanlanmis isleri
       # kapatir. 45 gunden eskiyse bos bir commit atar.
       - name: Zamanlamayi canli tut
