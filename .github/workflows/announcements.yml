@@ -8,7 +8,10 @@ name: Duyurular
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # GitHub yogunken birkac dakika gecikebilir
+    # "*/5" ile ayni anlam. Yazim 2026-10-02'de degistirildi: yeni eklenen
+    # zamanlama ~1 saat hic calismadi; cron satirini degistirmek GitHub'a
+    # yeniden kaydettirir. GitHub yogunken gecikebilir / atlayabilir.
+    - cron: "0-59/5 * * * *"
   workflow_dispatch: {}
 
 # Yalniz zamanlama ve elle tetikleme: fork/PR olaylari yok (secret'a
