@@ -2,22 +2,18 @@
 # tool/github/announcements.yml; buraya tool/sync_release_repo.sh kopyalar
 # (bu dosyayi burada elle degistirme).
 #
-# Herkese acik repoda calisir: Actions dakikasi sinirsiz, 5 dakikada bir
-# kontrol edilebilir. Anahtar repo "secret"inda (FCM_KEY), kodda degil.
+# YALNIZ elle / panelden tetiklenir (workflow_dispatch). Zamanlanmis yedek
+# 2026-10-03'te kaldirildi: GitHub saatlerce gec calistiriyordu, her
+# calisma mail atiyordu ve panel zaten aninda tetikliyor. Tetikleme
+# basarisiz olursa duyuru "Bekliyor"da kalir, panelden "Simdi gonder".
+# Anahtar repo "secret"inda (FCM_KEY), kodda degil.
 name: Duyurular
 
 on:
-  schedule:
-    # "*/5" ile ayni anlam. Yazim 2026-10-02'de degistirildi: yeni eklenen
-    # zamanlama ~1 saat hic calismadi; cron satirini degistirmek GitHub'a
-    # yeniden kaydettirir. GitHub yogunken gecikebilir / atlayabilir.
-    - cron: "0-59/5 * * * *"
   workflow_dispatch: {}
 
-# Yalniz zamanlama ve elle tetikleme: fork/PR olaylari yok (secret'a
-# erisemezler zaten).
 permissions:
-  contents: write # 60 gun kurali icin bos "keepalive" commit'i
+  contents: read
 
 concurrency:
   group: announcements
@@ -44,16 +40,3 @@ jobs:
         if: always()
         continue-on-error: true
         run: CHECKLIST_FCM_KEY="$RUNNER_TEMP/key.json" python3 tool/sync_profiles.py
-
-      # Acik repolarda 60 gun degisiklik olmazsa GitHub zamanlanmis isleri
-      # kapatir. 45 gunden eskiyse bos bir commit atar.
-      - name: Zamanlamayi canli tut
-        run: |
-          last=$(git log -1 --format=%ct)
-          days=$(( ($(date +%s) - last) / 86400 ))
-          if [ "$days" -ge 45 ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit --allow-empty -m "keepalive (duyuru zamanlamasi)"
-            git push
-          fi
