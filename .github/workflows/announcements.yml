@@ -24,7 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      # SHA'ya sabit (etiket sonradan kaydirilabilir); guncellemek icin
+      # `gh api repos/actions/checkout/git/ref/tags/vN` ile yeni SHA al.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Bekleyen duyurulari gonder
         env:
